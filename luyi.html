@@ -432,25 +432,26 @@
     <div class="blessing-list" id="blessingList"></div>
     <button class="clear-all-btn" onclick="clearAllBlessings()">清空所有弹窗</button>
 </div>
+<!-- 在 body 的最后位置添加 -->
+<audio id="backgroundMusic" src="img+audio/luyi.mp3" loop style="display: none;"></audio>
 
 <script>
-
     // 默认祝福语列表
     let defaultBlessings = [
-        { text: "天天开心ヾ(❀╹◡╹)ﾉﾞ 不许emo！", emoji: "❤️" },
+        { text: "很喜欢乌托邦这个名字，祝这位女孩天天开心！", emoji: "❤️" },
         { text: "雨下整夜，我的爱溢出就像雨水   ——《七里香》", emoji: "💖" },
         { text: "铜镜映无邪扎马尾☀️——《发如雪》", emoji: "✨" },
         { text: "琥珀色黄昏像糖在很美的远方！ ——《园游会》🌟", emoji: "🎉" },
         { text: "笑一个吧，功成名就不是目的💝    ——《稻香》", emoji: "🌸" },
         { text: "总有些惊奇的际遇，比方说当我遇上你  ——《小宇》", emoji: "🎸" },
-        { text: "你耳机听什么，能不能告诉我  ——《等你下课》💪", emoji: "🌈" },
+        { text: "你耳机听什么，能不能告诉我？  ——《等你下课》💪", emoji: "🌈" },
         { text: "思念变成海，在窗外进不来！  ——《花海》🦆", emoji: "🎯" },
         { text: "与风同雅，与月婵娟，与海多情，与山眠", emoji: "🏔️" },
         { text: "爱若火炬迎风，炽烈而哀恸", emoji: "💌" },
-        { text: "你美目如当年，流转我心间", emoji: "💌" },
-        { text: "1", emoji: "💌" },
-        { text: "2", emoji: "💌" },
-        { text: "3", emoji: "💌" },
+        { text: "你美目如当年，流转我心间   ——《如果当时》", emoji: "💌" },
+        { text: "等到秋叶终于金黄，等到华发悄然苍苍", emoji: "💌" },
+        { text: "你是千堆雪，我是长街 ——《邮差》", emoji: "💌" },
+        { text: "三月一路烟霞莺飞草长，柳絮纷飞里看见了故乡  ——《庐州月》", emoji: "💌" },
         { text: "我看着路，梦的路口有点窄，我遇见你是最美丽的意外   ——《遇见》", emoji: "🚇" },
         { text: "风温柔的清晰，也许会飘来好消息   ——《恶作剧》", emoji: "✉️" },
         { text: "想让流星实现幸福的愿望    ——《爱情讯息》", emoji: "🌠" },
@@ -467,110 +468,28 @@
     let popupCounter = 0;
     let isPanelOpen = false;
 
-    // 切换控制面板显示/隐藏
-    function toggleControlPanel() {
-        const ball = document.getElementById('floatingBall');
-        const panel = document.getElementById('controlPanel');
+    // --- 音乐相关变量 ---
+    const musicPlayer = document.getElementById('backgroundMusic');
+    let hasMusicStarted = false;
 
-        isPanelOpen = !isPanelOpen;
-
-        if (isPanelOpen) {
-            ball.classList.add('active');
-            panel.classList.add('active');
-        } else {
-            ball.classList.remove('active');
-            panel.classList.remove('active');
-        }
-    }
-
-    // 更新面板计数器
-    function updatePanelCounter() {
-        const counter = document.getElementById('panelCounter');
-        const totalBlessings = defaultBlessings.length + customBlessings.length;
-        counter.textContent = totalBlessings;
-
-        // 如果没有祝福语，隐藏计数器
-        if (totalBlessings === 0) {
-            counter.style.display = 'none';
-        } else {
-            counter.style.display = 'flex';
-        }
-    }
     // 处理留言按钮点击
     function handleMessageClick() {
-        // 这里可以添加原有的留言逻辑
         console.log("执行原有留言逻辑...");
-
-        // 触发祝福弹窗
         showBlessingPopups();
-        playBackgroundMusic();
-    }
-    function playBackgroundMusic() {
-        // 创建 Audio 对象，使用你的音乐链接
-        const musicUrl = 'img+audio/therightpath.mp3'; // 替换为你的音乐链接
-
-        // 创建音频对象
-        const audio = new Audio(musicUrl);
-        audio.loop = true; // 设置循环播放
-        audio.volume = 0.5; // 设置音量
-
-        // 尝试播放音乐
-        audio.play().then(() => {
-            console.log("音乐开始播放");
-        }).catch(error => {
-            console.log("音乐播放失败:", error);
-            // 可以在这里添加一个提示，让用户点击播放按钮
-            showMusicPlayButton(musicUrl);
-        });
     }
 
-    // 新增函数：显示音乐播放按钮（当自动播放失败时）
-    function showMusicPlayButton(musicUrl) {
-        // 检查是否已存在播放按钮
-        let playButton = document.getElementById('musicPlayButton');
-
-        if (!playButton) {
-            playButton = document.createElement('button');
-            playButton.id = 'musicPlayButton';
-            playButton.innerHTML = '🎵 播放背景音乐';
-            playButton.style.cssText = `
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            padding: 10px 15px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            z-index: 1000;
-            font-size: 14px;
-        `;
-
-            // 点击播放按钮
-            playButton.addEventListener('click', function() {
-                const audio = new Audio(musicUrl);
-                audio.loop = true;
-                audio.volume = 0.5;
-                audio.play();
-                this.style.display = 'none'; // 播放后隐藏按钮
-            });
-
-            document.body.appendChild(playButton);
-        } else {
-            playButton.style.display = 'block';
-        }
-    }
     // 显示祝福弹窗
     function showBlessingPopups() {
         const allBlessings = [...defaultBlessings, ...customBlessings];
-        const popupCount = Math.floor(Math.random() * 5) + 16; // 8-12个弹窗
+        if (allBlessings.length === 0) return;
+
+        const popupCount = Math.floor(Math.random() * 5) + 16; // 16-20个弹窗
 
         for (let i = 0; i < popupCount; i++) {
             setTimeout(() => {
                 const blessing = allBlessings[Math.floor(Math.random() * allBlessings.length)];
                 createPopup(blessing);
-            }, i * 200); // 每200ms出现一个弹窗
+            }, i * 200);
         }
     }
 
@@ -580,7 +499,6 @@
         popup.className = 'blessing-popup';
         popup.id = `popup-${popupCounter++}`;
 
-        // 随机位置（确保在窗口内）
         const maxX = window.innerWidth - 300;
         const maxY = window.innerHeight - 200;
         const randomX = Math.random() * maxX;
@@ -588,11 +506,8 @@
 
         popup.style.left = `${randomX}px`;
         popup.style.top = `${randomY}px`;
-
-        // 随机z-index实现堆叠效果
         popup.style.zIndex = 1000 + Math.floor(Math.random() * 100);
 
-        // 随机背景色（保持粉色系）
         const colors = [
             'linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%)',
             'linear-gradient(135deg, #fab1a0 0%, #ff7675 100%)',
@@ -603,20 +518,19 @@
         const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
         popup.innerHTML = `
-                <div class="popup-header">
-                    <span class="icon">💌</span>
-                    <span>鱼玄机祝你</span>
-                    <span class="popup-close" onclick="closePopup('${popup.id}')">×</span>
-                </div>
-                <div class="popup-content" style="background: ${randomColor}">
-                    <span class="popup-emoji">${blessing.emoji}</span>
-                    ${blessing.text}
-                </div>
-            `;
+            <div class="popup-header">
+                <span class="icon">💌</span>
+                <span>鱼玄机祝你</span>
+                <span class="popup-close" onclick="closePopup('${popup.id}')">×</span>
+            </div>
+            <div class="popup-content" style="background: ${randomColor}">
+                <span class="popup-emoji">${blessing.emoji}</span>
+                ${blessing.text}
+            </div>
+        `;
 
         document.body.appendChild(popup);
 
-        // 10秒后自动关闭
         setTimeout(() => {
             closePopup(popup.id);
         }, 10000);
@@ -633,7 +547,28 @@
         }
     }
 
-    // 添加自定义祝福语
+    // --- 控制面板相关函数 ---
+    function toggleControlPanel() {
+        const ball = document.getElementById('floatingBall');
+        const panel = document.getElementById('controlPanel');
+        isPanelOpen = !isPanelOpen;
+
+        if (isPanelOpen) {
+            ball.classList.add('active');
+            panel.classList.add('active');
+        } else {
+            ball.classList.remove('active');
+            panel.classList.remove('active');
+        }
+    }
+
+    function updatePanelCounter() {
+        const counter = document.getElementById('panelCounter');
+        const totalBlessings = defaultBlessings.length + customBlessings.length;
+        counter.textContent = totalBlessings;
+        counter.style.display = totalBlessings === 0 ? 'none' : 'flex';
+    }
+
     function addCustomBlessing() {
         const input = document.getElementById('blessingInput');
         const text = input.value.trim();
@@ -641,113 +576,107 @@
         if (text) {
             const emojis = ['💝', '🌟', '🎉', '✨', '🌈', '💖', '🌸', '🎯'];
             const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
-
-            customBlessings.push({
-                text: text,
-                emoji: randomEmoji
-            });
-
+            customBlessings.push({ text: text, emoji: randomEmoji });
             input.value = '';
             updateBlessingList();
             updatePanelCounter();
             showNotification('祝福语添加成功！');
         }
     }
-    // 显示通知
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: rgba(0, 0, 0, 0.8);
-                color: white;
-                padding: 12px 24px;
-                border-radius: 8px;
-                z-index: 2000;
-                animation: fadeInOut 2s ease;
-            `;
-        notification.textContent = message;
-        document.body.appendChild(notification);
 
-        setTimeout(() => {
-            notification.remove();
-        }, 2000);
-    }
-    // 更新祝福语列表显示
-    function updateBlessingList() {
-        const listContainer = document.getElementById('blessingList');
-        listContainer.innerHTML = '';
-
-        [...defaultBlessings, ...customBlessings].forEach((blessing, index) => {
-            const item = document.createElement('div');
-            item.className = 'blessing-item';
-            item.innerHTML = `
-                    <span>${blessing.emoji} ${blessing.text.substring(0, 15)}...</span>
-                    ${index >= defaultBlessings.length ? `<span class="delete-blessing" onclick="deleteBlessing(${index - defaultBlessings.length})">×</span>` : ''}
-                `;
-            listContainer.appendChild(item);
-        });
-    }
-
-    // 删除自定义祝福语
     function deleteBlessing(index) {
         customBlessings.splice(index, 1);
         updateBlessingList();
+        updatePanelCounter();
     }
 
-    // 清空所有弹窗
     function clearAllBlessings() {
         const popups = document.querySelectorAll('.blessing-popup');
         popups.forEach(popup => {
             popup.style.animation = 'popupDisappear 0.3s ease-out';
-            setTimeout(() => {
-                popup.remove();
-            }, 300);
+            setTimeout(() => popup.remove(), 300);
         });
     }
 
-    // 添加消失动画
-    const style = document.createElement('style');
-    style.textContent = `
-            @keyframes popupDisappear {
-                0% {
-                    transform: scale(1) rotate(0deg);
-                    opacity: 1;
-                }
-                100% {
-                    transform: scale(0) rotate(10deg);
-                    opacity: 0;
-                }
-            }
-            @keyframes fadeInOut {
-                0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-                20% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-                80% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-                100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
-            }
+    function updateBlessingList() {
+        const listContainer = document.getElementById('blessingList');
+        listContainer.innerHTML = '';
+        [...defaultBlessings, ...customBlessings].forEach((blessing, index) => {
+            const item = document.createElement('div');
+            item.className = 'blessing-item';
+            const isCustom = index >= defaultBlessings.length;
+            item.innerHTML = `
+                <span>${blessing.emoji} ${blessing.text.substring(0, 15)}...</span>
+                ${isCustom ? `<span class="delete-blessing" onclick="deleteBlessing(${index - defaultBlessings.length})">×</span>` : ''}
+            `;
+            listContainer.appendChild(item);
+        });
+    }
+
+    function showNotification(message) {
+        const notification = document.createElement('div');
+        notification.style.cssText = `
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8); color: white; padding: 12px 24px;
+            border-radius: 8px; z-index: 2000; animation: fadeInOut 2s ease;
         `;
-    document.head.appendChild(style);
-    // 点击页面其他地方关闭面板
+        notification.textContent = message;
+        document.body.appendChild(notification);
+        setTimeout(() => notification.remove(), 2000);
+    }
+
+    // --- 核心：整合的全局点击监听器 ---
     document.addEventListener('click', function(event) {
+        // 1. 处理音乐播放（只执行一次）
+        if (!hasMusicStarted && musicPlayer) {
+            console.log("检测到用户首次点击，启动背景音乐...");
+            const playPromise = musicPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    console.log("✅ 背景音乐播放成功！");
+                }).catch(error => {
+                    console.error("❌ 音乐播放失败:", error);
+                });
+            }
+            hasMusicStarted = true; // 标记为已启动，之后不再执行
+        }
+
+        // 2. 处理控制面板关闭
         const ball = document.getElementById('floatingBall');
         const panel = document.getElementById('controlPanel');
-
         if (isPanelOpen && !ball.contains(event.target) && !panel.contains(event.target)) {
             toggleControlPanel();
         }
-    });
-    // 初始化祝福语列表
-    updateBlessingList();
-    updatePanelCounter();
+    }, true); // 使用捕获阶段，确保音乐优先触发
 
-    // 监听回车键添加祝福语
-    document.getElementById('blessingInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            addCustomBlessing();
-        }
-    });
+    // --- 初始化 ---
+    function init() {
+        updateBlessingList();
+        updatePanelCounter();
+
+        // 监听回车键添加祝福语
+        document.getElementById('blessingInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addCustomBlessing();
+            }
+        });
+
+        // 添加动画样式
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes popupDisappear { 0% { transform: scale(1) rotate(0deg); opacity: 1; } 100% { transform: scale(0) rotate(10deg); opacity: 0; } }
+            @keyframes fadeInOut { 0% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } 20% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 80% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.8); } }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // 确保DOM加载完毕后再执行初始化
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 </script>
+
 </body>
 </html>

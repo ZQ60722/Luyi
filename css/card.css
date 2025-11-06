@@ -116,3 +116,36 @@
     height: 25px;
     font-size: 1rem;
 }
+/* ==================== 飘动祝福语样式 ==================== */
+
+.floating-text {
+    position: fixed;
+    color: #ff6b6b; /* 一个漂亮的珊瑚红 */
+    font-family: 'Ma Shan Zheng', 'STKaiti', '楷体', cursive; /* 使用你已有的手写字体 */
+    font-weight: bold;
+    text-shadow:
+            0 0 5px rgba(255, 107, 107, 0.5),
+            0 0 10px rgba(255, 255, 255, 0.8),
+            0 0 15px rgba(255, 107, 107, 0.3); /* 梦幻的光晕效果 */
+    z-index: 998; /* 层级在卡片和浮动表情之下，作为背景 */
+    pointer-events: none; /* 鼠标穿透，不影响操作 */
+    white-space: nowrap; /* 防止文字换行 */
+    animation: float-up ease-out forwards;
+    will-change: transform, opacity;
+}
+
+/* 飘动动画 */
+@keyframes float-up {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0.5);
+    }
+    15% {
+        opacity: 1;
+        transform: translate(calc(var(--end-x) * 0.1), calc(var(--end-y) * 0.1)) scale(1);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(var(--end-x), var(--end-y)) scale(0.8);
+    }
+}
